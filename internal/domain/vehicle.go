@@ -2,6 +2,9 @@ package domain
 
 import (
 	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // 📝 설명: 차량 도메인 모델
@@ -29,31 +32,32 @@ const (
 
 // Vehicle - 차량 엔티티
 type Vehicle struct {
-	ID           string        `json:"id"`
-	PlateNumber  string        `json:"plate_number"`   // 차량 번호 (예: "12가3456")
-	Model        string        `json:"model"`          // 차량 모델 (예: "그랜드스타렉스")
-	Manufacturer string        `json:"manufacturer"`   // 제조사 (예: "현대")
-	VehicleType  VehicleType   `json:"vehicle_type"`   // 차량 유형
-	Capacity     int           `json:"capacity"`       // 정원 (운전자 포함)
-	Year         int           `json:"year"`           // 연식
-	Color        string        `json:"color"`          // 색상
-	Status       VehicleStatus `json:"status"`         // 차량 상태
+	ID           string        `json:"id" gorm:"type:uuid;primaryKey"`
+	PlateNumber  string        `json:"plate_number" gorm:"uniqueIndex;not null"` // 차량 번호 (예: "12가3456")
+	Model        string        `json:"model" gorm:"not null"`                    // 차량 모델 (예: "그랜드스타렉스")
+	Manufacturer string        `json:"manufacturer"`                             // 제조사 (예: "현대")
+	VehicleType  VehicleType   `json:"vehicle_type" gorm:"type:varchar(20);not null"` // 차량 유형
+	Capacity     int           `json:"capacity" gorm:"not null"`                 // 정원 (운전자 포함)
+	Year         int           `json:"year"`                                     // 연식
+	Color        string        `json:"color"`                                    // 색상
+	Status       VehicleStatus `json:"status" gorm:"type:varchar(20);not null;default:'active'"` // 차량 상태
 
 	// 차량 관리 정보
-	InsuranceExpiry    *time.Time `json:"insurance_expiry,omitempty"`     // 보험 만료일
-	InspectionExpiry   *time.Time `json:"inspection_expiry,omitempty"`    // 정기검사 만료일
-	LastMaintenanceAt  *time.Time `json:"last_maintenance_at,omitempty"`  // 마지막 정비 날짜
+	InsuranceExpiry   *time.Time `json:"insurance_expiry,omitempty"`    // 보험 만료일
+	InspectionExpiry  *time.Time `json:"inspection_expiry,omitempty"`   // 정기검사 만료일
+	LastMaintenanceAt *time.Time `json:"last_maintenance_at,omitempty"` // 마지막 정비 날짜
 
 	// 메타데이터
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"` // Soft delete
+	DeletedAt *time.Time `json:"deleted_at,omitempty" gorm:"index"` // Soft delete
 }
 
 // NewVehicle - 차량 생성 팩토리 함수
 func NewVehicle(plateNumber, model, manufacturer string, vehicleType VehicleType, capacity, year int, color string) *Vehicle {
 	now := time.Now()
 	return &Vehicle{
+		ID:           uuid.New().String(), // UUID 자동 생성
 		PlateNumber:  plateNumber,
 		Model:        model,
 		Manufacturer: manufacturer,
@@ -65,6 +69,23 @@ func NewVehicle(plateNumber, model, manufacturer string, vehicleType VehicleType
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
+}
+
+// BeforeCreate - GORM Hook: 생성 전 자동 처리
+func (v *Vehicle) BeforeCreate(tx *gorm.DB) error {
+	if v.ID == "" {
+		v.ID = uuid.New().String()
+	}
+	now := time.Now()
+	v.CreatedAt = now
+	v.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate - GORM Hook: 업데이트 전 자동 처리
+func (v *Vehicle) BeforeUpdate(tx *gorm.DB) error {
+	v.UpdatedAt = time.Now()
+	return nil
 }
 
 // IsActive - 운행 가능한 차량인지 확인
