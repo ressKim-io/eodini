@@ -33,7 +33,13 @@ type HealthResponse struct {
 }
 
 // Health - 기본 Health Check
-// GET /health
+// @Summary		서버 상태 확인
+// @Description	서버의 기본 상태 및 가동 시간을 확인합니다
+// @Tags		Health
+// @Accept		json
+// @Produce		json
+// @Success		200	{object}	map[string]interface{}	"서버 정상"
+// @Router		/health [get]
 func (h *HealthHandler) Health(c *gin.Context) {
 	uptime := time.Since(h.startTime)
 
@@ -48,8 +54,14 @@ func (h *HealthHandler) Health(c *gin.Context) {
 }
 
 // Readiness - Readiness Probe (K8s용)
-// GET /health/ready
-// 외부 의존성(DB, Redis 등) 확인
+// @Summary		Readiness Probe
+// @Description	서버의 준비 상태를 확인합니다 (DB, Redis 등 외부 의존성 체크)
+// @Tags		Health
+// @Accept		json
+// @Produce		json
+// @Success		200	{object}	map[string]interface{}	"서버 준비됨"
+// @Failure		503	{object}	map[string]interface{}	"서버 준비되지 않음"
+// @Router		/health/ready [get]
 func (h *HealthHandler) Readiness(c *gin.Context) {
 	// TODO: 데이터베이스 연결 확인
 	// TODO: Redis 연결 확인
@@ -67,8 +79,13 @@ func (h *HealthHandler) Readiness(c *gin.Context) {
 }
 
 // Liveness - Liveness Probe (K8s용)
-// GET /health/live
-// 서버가 살아있는지만 확인 (가장 가벼운 체크)
+// @Summary		Liveness Probe
+// @Description	서버가 살아있는지 확인합니다 (가장 가벼운 체크)
+// @Tags		Health
+// @Accept		json
+// @Produce		json
+// @Success		200	{object}	map[string]interface{}	"서버 살아있음"
+// @Router		/health/live [get]
 func (h *HealthHandler) Liveness(c *gin.Context) {
 	util.SuccessResponse(c, http.StatusOK, "서버가 살아있습니다", map[string]string{
 		"status": "alive",

@@ -1,4 +1,4 @@
-.PHONY: help run test test-unit test-integration test-coverage clean build docker-build docker-run
+.PHONY: help run test test-unit test-integration test-coverage clean build docker-build docker-run swagger swagger-install
 
 # 기본 변수
 APP_NAME=eodini
@@ -97,5 +97,24 @@ migrate-up: ## 데이터베이스 마이그레이션 (추후)
 migrate-down: ## 마이그레이션 롤백 (추후)
 	@echo "🔄 마이그레이션 롤백 중..."
 	@echo "⚠️  마이그레이션 기능은 추후 구현 예정"
+
+swagger-install: ## Swagger CLI 설치
+	@echo "📦 Swagger CLI 설치 중..."
+	@go install github.com/swaggo/swag/cmd/swag@latest
+	@echo "✅ Swagger CLI 설치 완료"
+
+swagger: ## Swagger 문서 생성
+	@echo "📚 Swagger 문서 생성 중..."
+	@if command -v swag > /dev/null; then \
+		swag init -g $(MAIN_PATH) -o docs; \
+	elif [ -f ~/go/bin/swag ]; then \
+		~/go/bin/swag init -g $(MAIN_PATH) -o docs; \
+	else \
+		echo "⚠️  swag CLI가 설치되지 않았습니다."; \
+		echo "설치: make swagger-install"; \
+		exit 1; \
+	fi
+	@echo "✅ Swagger 문서 생성 완료 (docs/)"
+	@echo "📖 Swagger UI: http://localhost:8080/swagger/index.html"
 
 .DEFAULT_GOAL := help

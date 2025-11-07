@@ -1,0 +1,77 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact:
+    email: support@eodini.com
+    name: API Support
+  description: 통학/통원 차량 관리 시스템 API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Eodini API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: 서버의 기본 상태 및 가동 시간을 확인합니다
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 서버 정상
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 서버 상태 확인
+      tags:
+      - Health
+  /health/live:
+    get:
+      consumes:
+      - application/json
+      description: 서버가 살아있는지 확인합니다 (가장 가벼운 체크)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 서버 살아있음
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Liveness Probe
+      tags:
+      - Health
+  /health/ready:
+    get:
+      consumes:
+      - application/json
+      description: 서버의 준비 상태를 확인합니다 (DB, Redis 등 외부 의존성 체크)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 서버 준비됨
+          schema:
+            additionalProperties: true
+            type: object
+        "503":
+          description: 서버 준비되지 않음
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Readiness Probe
+      tags:
+      - Health
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: JWT Bearer token (추후 구현 예정)
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

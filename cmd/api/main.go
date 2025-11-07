@@ -19,6 +19,21 @@ import (
 // 🎯 실무 포인트: Graceful Shutdown, 설정 로드, 로거 초기화
 // ⚠️ 주의사항: 서버 시작 전 설정 검증 필수
 
+// @title						Eodini API
+// @version					1.0
+// @description				통학/통원 차량 관리 시스템 API
+// @termsOfService				http://swagger.io/terms/
+// @contact.name				API Support
+// @contact.email				support@eodini.com
+// @license.name				Apache 2.0
+// @license.url				http://www.apache.org/licenses/LICENSE-2.0.html
+// @host						localhost:8080
+// @BasePath					/api/v1
+// @schemes					http https
+// @securityDefinitions.apikey	BearerAuth
+// @in							header
+// @name						Authorization
+// @description				JWT Bearer token (추후 구현 예정)
 func main() {
 	// 1. 설정 로드
 	cfg, err := config.Load()
