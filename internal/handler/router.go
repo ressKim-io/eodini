@@ -3,6 +3,10 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hyeokjun/eodini/internal/middleware"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/hyeokjun/eodini/docs" // Swagger 문서 임포트
 )
 
 // 📝 설명: API 라우터 설정
@@ -25,6 +29,9 @@ func SetupRouter() *gin.Engine {
 	router.GET("/health", healthHandler.Health)
 	router.GET("/health/ready", healthHandler.Readiness)
 	router.GET("/health/live", healthHandler.Liveness)
+
+	// Swagger UI
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// API v1 그룹
 	v1 := router.Group("/api/v1")
